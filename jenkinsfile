@@ -1,0 +1,37 @@
+pipeline {
+  agent any
+
+  tools {
+    maven 'maven3.9.9'      // Must match name in Jenkins
+    jdk 'JDK_17'         // Must match name in Jenkins
+  }
+
+  environment {
+    JAVA_HOME = "${tool 'JDK_17'}"
+    PATH = "${JAVA_HOME}/bin:${env.PATH}"
+  }
+
+  stages {
+    stage('Checkout Code') {
+      steps {
+        git branch: 'main', url: 'https://github.com/shivani-snaatak/salary-api.git'
+      }
+    }
+
+    stage('Compile Java Code') {
+      steps {
+        echo "⚙️ Compiling Java code..."
+        sh 'mvn clean compile'
+      }
+    }
+  }
+
+  post {
+    success {
+      echo "✅ Compilation successful!"
+    }
+    failure {
+      echo "❌ Compilation failed!"
+    }
+  }
+}
