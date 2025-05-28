@@ -1,0 +1,28 @@
+node {
+    // Define tools
+    def mvnHome = tool name: 'maven3.9.9', type: 'maven'
+    def jdkHome = tool name: 'JDK_17', type: 'jdk'
+
+    // Set environment variables
+    env.JAVA_HOME = jdkHome
+    env.PATH = "${jdkHome}/bin:${env.PATH}"
+
+    try {
+        stage('Checkout Code') {
+            checkout([$class: 'GitSCM',
+                branches: [[name: '*/main']],
+                userRemoteConfigs: [[url: 'https://github.com/shivani-snaatak/salary-api.git']]
+            ])
+        }
+
+        stage('Compile Java Code') {
+            echo "⚙️ Compiling Java code..."
+            sh "${mvnHome}/bin/mvn clean compile"
+        }
+
+        echo "✅ Compilation successful!"
+    } catch (Exception e) {
+        echo "❌ Compilation failed!"
+        throw e
+    }
+}
